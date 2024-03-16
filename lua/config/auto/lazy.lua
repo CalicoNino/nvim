@@ -1,4 +1,3 @@
--- custom/plugins/lazy.lua
 --
 -- See the kickstart.nvim README for more information
 
