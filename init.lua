@@ -134,7 +134,7 @@ local lazyPlugins = {
 
   -- THEME ------------------------------------------------------------
   -- To switch between light and dark, comment out one of the either light or
-  -- dark. If you leave both uncommented, the one with highe "priority" will be
+  -- dark. If you leave both uncommented, the one with high "priority" will be
   -- the theme.
 
   --[[ THEME / LIGHT ]] --
@@ -207,8 +207,8 @@ local lazyPlugins = {
       --- caps labels like "NORMAL", "INSERT", and "V-BLOCK".
       local modeAbbreviation = function()
         local modes_abbrev = {
-          ['n'] = '普通', -- NORMAL
-          ['i'] = '入れる', -- INSERT
+          -- ['n'] = 'NORMAL', -- NORMAL
+          -- ['i'] = 'INSERT', -- INSERT
         }
         local current_mode = vim.api.nvim_get_mode().mode
         return modes_abbrev[current_mode] or current_mode

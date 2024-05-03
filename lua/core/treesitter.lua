@@ -3,6 +3,7 @@
 -- nvim-treesitter provides syntax highlighting, text objects, code indentation,
 -- and other language-aware features for Neovim using Tree-sitter parsers.
 require('nvim-treesitter.configs').setup {
+  -- nvim-ts-context-commentstring is set up automatically
   -- ensure_installed: Add languages to be installed here that you want installed for treesitter
   ensure_installed = {
     'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx',
@@ -91,7 +92,7 @@ require('nvim-treesitter.configs').setup {
   -- For treesitter plugin: 'JoosepAlviste/nvim-ts-context-commentstring'
   -- See: https://github.com/JoosepAlviste/nvim-ts-context-commentstring
   -- [Plugin docs](https://github.com/JoosepAlviste/nvim-ts-context-commentstring/blob/main/doc/nvim-ts-context-commentstring.txt)
-  context_commentstring = { enable = true },
+  -- context_commentstring = { enable = true },
 }
 
 -- Setup the plugin manually rather than as an nvim-treesitter module. We do

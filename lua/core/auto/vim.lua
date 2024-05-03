@@ -65,25 +65,24 @@ vim.cmd([[
 -- vim.g.netrw_liststyle = 3
 
 -- We're using the `:syntax keyword` command to add keywords to the a syntax
--- group like `UniqueDivineTODO`.
+-- group like `TODO`.
 --
 -- The `highlight link` block ensures that the syntax group will be highlighted
 -- with the built-in `Todo` group, which typically represents tasks and to-dos.
 vim.cmd([[
   " highlight Todo ctermbg=cyan ctermfg=black guibg="#4795a9" guifg=black
-  syntax match UniqueDivineTODO /\v(TODO|FIXME|NOTE|Q:)/
-  highlight UniqueDivineTODO ctermbg=cyan ctermfg=black guibg=cyan guifg=black
-  highlight link UniqueDivineTODO ToolbarButton
-  highlight link Todo UniqueDivineTODO
+  syntax match TODO /\v(TODO|FIXME|NOTE|Q:)/
+  highlight TODO ctermbg=cyan ctermfg=black guibg=cyan guifg=black
+  highlight link TODO ToolbarButton
+  highlight link Todo TODO
 ]])
 
 vim.cmd([[
-  syntax match UniqueDivineTODO /\v(TODO|FIXME|NOTE|Q:)/
-  highlight UniqueDivineTODO guibg=cyan ctermbg=cyan
+  syntax match TODO /\v(TODO|FIXME|NOTE|Q:)/
+  highlight TODO guibg=cyan ctermbg=cyan
 
   syn match customPattern "car[0-9]\+"
   hi customPattern guifg=cyan ctermbg=cyan
-  " highlight UniqueDivineTODO TODO FIXME NOTE
 ]])
 
 -- highlight link [target-group] [source-group]
