@@ -134,7 +134,7 @@ local lazyPlugins = {
 
   -- THEME ------------------------------------------------------------
   -- To switch between light and dark, comment out one of the either light or
-  -- dark. If you leave both uncommented, the one with high "priority" will be
+  -- dark. If you leave both uncommented, the one with lower "priority" will be
   -- the theme.
 
   --[[ THEME / LIGHT ]] --
@@ -142,7 +142,7 @@ local lazyPlugins = {
     -- Repo: https://github.com/catppuccin/nvim
     "catppuccin/nvim",
     name = "catppuccin",
-    priority = 420,
+    priority = 100,
     config = function()
       -- Early return if the background is not set to "light"
       if vim.o.background ~= "light" then
@@ -155,17 +155,17 @@ local lazyPlugins = {
       local theme = require("catppuccin")
       theme.setup({
         flavour = "latte", -- options: latte, frappe, macchiato, mocha
-        transparent_background = true,
+        -- transparent_background = true,
       })
     end
   },
 
-  --[[ THEME / DARK ]] --
+  ----[[ THEME / DARK ]] --
   {
     -- Theme inspired by Atom
     -- Repo: https://github.com/navarasu/onedark.nvim
     'navarasu/onedark.nvim',
-    priority = 1000,
+    priority = 100,
     config = function()
       -- Early return if the background is not set to "dark"
       if vim.o.background ~= "dark" then
@@ -196,6 +196,40 @@ local lazyPlugins = {
       }
       theme_onedark.load() -- officially load the theme
     end,
+  },
+
+  {
+    "rebelot/kanagawa.nvim",
+    priority = 1,
+    config = function()
+      vim.cmd.colorscheme 'kanagawa'
+      local theme_kanagawa = require('kanagawa')
+      theme_kanagawa.setup {
+        compile = false,  -- enable compiling the colorscheme
+        undercurl = true, -- enable undercurls
+        commentStyle = { italic = true },
+        functionStyle = {},
+        keywordStyle = { italic = true },
+        statementStyle = { bold = true },
+        typeStyle = {},
+        transparent = false,   -- do not set background color
+        dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
+        terminalColors = true, -- define vim.g.terminal_color_{0,17}
+        colors = {             -- add/modify theme and palette colors
+          palette = {},
+          theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
+        },
+        overrides = function(colors) -- add/modify highlights
+          return {}
+        end,
+        theme = "dragon",  -- Load "wave" theme when 'background' option is not set
+        background = {     -- map the value of 'background' option to a theme
+          dark = "dragon", -- try "dragon" !
+          light = "lotus"
+        },
+      }
+      theme_kanagawa.load()
+    end
   },
 
   {
