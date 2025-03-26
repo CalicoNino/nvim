@@ -5,3 +5,4 @@ vim.cmd("set shiftwidth=2")
 
 require("my_settings")
 require("config.lazy")
+vim.cmd("colorscheme kanagawa")
