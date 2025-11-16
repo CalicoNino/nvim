@@ -1,62 +1,258 @@
--- plugins/telescope.lua
 return {
-  {
-    'nvim-telescope/telescope.nvim',
-    tag = '0.1.8', -- Or use branch = '0.1.x' if you prefer the latest stable version
-    dependencies = { 'nvim-lua/plenary.nvim' },
+	{
+		enabled = false,
+		"folke/flash.nvim",
+		---@type Flash.Config
+		opts = {
+			search = {
+				forward = true,
+				multi_window = false,
+				wrap = false,
+				incremental = true,
+			},
+		},
+	},
 
-    config = function()
-      local telescope = require("telescope")
+	{
+		"echasnovski/mini.hipatterns",
+		event = "BufReadPre",
+		opts = {
+			highlighters = {
+				hsl_color = {
+					pattern = "hsl%(%d+,? %d+%%?,? %d+%%?%)",
+					group = function(_, match)
+						local utils = require("solarized-osaka.hsl")
+						--- @type string, string, string
+						local nh, ns, nl = match:match("hsl%((%d+),? (%d+)%%?,? (%d+)%%?%)")
+						--- @type number?, number?, number?
+						local h, s, l = tonumber(nh), tonumber(ns), tonumber(nl)
+						--- @type string
+						local hex_color = utils.hslToHex(h, s, l)
+						return MiniHipatterns.compute_hex_color_group(hex_color, "bg")
+					end,
+				},
+			},
+		},
+	},
 
-      -- Setup Telescope with custom options
-      telescope.setup({
-        defaults = {
-          file_ignore_patterns = { "node_modules", ".git" }, -- Ignore unwanted folders
-        },
-        pickers = {
-          find_files = {
-            hidden = true,  -- Show hidden files
-            no_ignore = true, -- Include ignored files in `.gitignore` and `.ignore`
-          },
-          git_files = {
-            show_untracked = true,  -- Show untracked files in git
-          },
-          grep_string = {
-            search = "",  -- Default search string for the function
-          },
-          live_grep = {
-            additional_args = function() return {"--ignore-file", ".gitignore"} end,  -- Ignore files listed in .gitignore
-          },
-        },
-      })
+	{
+		"dinhhuy258/git.nvim",
+		event = "BufReadPre",
+		opts = {
+			keymaps = {
+				-- Open blame window
+				blame = "<Leader>gb",
+				-- Open file/folder in git repository
+				browse = "<Leader>go",
+			},
+		},
+	},
 
-      -- Keymap for find_files (C-p)
-      vim.keymap.set("n", "<C-p>", "<cmd>Telescope find_files<cr>", { desc = "Find files" })
+	{
+		"nvim-telescope/telescope.nvim",
+		dependencies = {
+			{
+				"nvim-telescope/telescope-fzf-native.nvim",
+				build = "make",
+			},
+			"nvim-telescope/telescope-file-browser.nvim",
+		},
+		keys = {
+			{
+				"<leader>fP",
+				function()
+					require("telescope.builtin").find_files({
+						cwd = require("lazy.core.config").options.root,
+					})
+				end,
+				desc = "Find Plugin File",
+			},
+			{
+				";f",
+				function()
+					local builtin = require("telescope.builtin")
+					builtin.find_files({
+						no_ignore = false,
+						hidden = true,
+					})
+				end,
+				desc = "Lists files in your current working directory, respects .gitignore",
+			},
+			{
+				";r",
+				function()
+					local builtin = require("telescope.builtin")
+					builtin.live_grep({
+						additional_args = { "--hidden" },
+					})
+				end,
+				desc = "Search for a string in your current working directory and get results live as you type, respects .gitignore",
+			},
+			{
+				"\\\\",
+				function()
+					local builtin = require("telescope.builtin")
+					builtin.buffers()
+				end,
+				desc = "Lists open buffers",
+			},
+			{
+				";t",
+				function()
+					local builtin = require("telescope.builtin")
+					builtin.help_tags()
+				end,
+				desc = "Lists available help tags and opens a new window with the relevant help info on <cr>",
+			},
+			{
+				";;",
+				function()
+					local builtin = require("telescope.builtin")
+					builtin.resume()
+				end,
+				desc = "Resume the previous telescope picker",
+			},
+			{
+				";e",
+				function()
+					local builtin = require("telescope.builtin")
+					builtin.diagnostics()
+				end,
+				desc = "Lists Diagnostics for all open buffers or a specific buffer",
+			},
+			{
+				";s",
+				function()
+					local builtin = require("telescope.builtin")
+					builtin.treesitter()
+				end,
+				desc = "Lists Function names, variables, from Treesitter",
+			},
+			{
+				";c",
+				function()
+					local builtin = require("telescope.builtin")
+					builtin.lsp_incoming_calls()
+				end,
+				desc = "Lists LSP incoming calls for word under the cursor",
+			},
+			{
+				"sf",
+				function()
+					local telescope = require("telescope")
 
-      -- Keymap for git_files (C-g)
-      vim.keymap.set("n", "<C-g>", "<cmd>Telescope git_files<cr>", { desc = "Find files in git repo" })
+					local function telescope_buffer_dir()
+						return vim.fn.expand("%:p:h")
+					end
 
-      -- Keymap for grep_string (C-s)
-      vim.keymap.set("n", "<C-s>", "<cmd>Telescope grep_string<cr>", { desc = "Search for string under cursor" })
+					telescope.extensions.file_browser.file_browser({
+						path = "%:p:h",
+						cwd = telescope_buffer_dir(),
+						respect_gitignore = false,
+						hidden = true,
+						grouped = true,
+						previewer = false,
+						initial_mode = "normal",
+						layout_config = { height = 40 },
+					})
+				end,
+				desc = "Open File Browser with the path of the current buffer",
+			},
+		},
+		config = function(_, opts)
+			local telescope = require("telescope")
+			local actions = require("telescope.actions")
+			local fb_actions = require("telescope").extensions.file_browser.actions
 
-      -- Keymap for live_grep (C-f)
-      vim.keymap.set("n", "<C-f>", "<cmd>Telescope live_grep<cr>", { desc = "Live grep search" })
-    end,
-  },
-  {
-    'nvim-telescope/telescope-ui-select.nvim',
-    config = function()
-      require("telescope").setup {
-        extensions = {
-          ["ui-select"] = {
-            require("telescope.themes").get_dropdown {
-              -- even more opts
-            }
-          }
-        }
-      }
-      require("telescope").load_extension("ui-select")
-    end
-  }
+			opts.defaults = vim.tbl_deep_extend("force", opts.defaults, {
+				wrap_results = true,
+				layout_strategy = "horizontal",
+				layout_config = { prompt_position = "top" },
+				sorting_strategy = "ascending",
+				winblend = 0,
+				mappings = {
+					n = {},
+				},
+			})
+			opts.pickers = {
+				diagnostics = {
+					theme = "ivy",
+					initial_mode = "normal",
+					layout_config = {
+						preview_cutoff = 9999,
+					},
+				},
+			}
+			opts.extensions = {
+				file_browser = {
+					theme = "dropdown",
+					-- disables netrw and use telescope-file-browser in its place
+					hijack_netrw = true,
+					mappings = {
+						-- your custom insert mode mappings
+						["n"] = {
+							-- your custom normal mode mappings
+							["N"] = fb_actions.create,
+							["h"] = fb_actions.goto_parent_dir,
+							["/"] = function()
+								vim.cmd("startinsert")
+							end,
+							["<C-u>"] = function(prompt_bufnr)
+								for i = 1, 10 do
+									actions.move_selection_previous(prompt_bufnr)
+								end
+							end,
+							["<C-d>"] = function(prompt_bufnr)
+								for i = 1, 10 do
+									actions.move_selection_next(prompt_bufnr)
+								end
+							end,
+							["<PageUp>"] = actions.preview_scrolling_up,
+							["<PageDown>"] = actions.preview_scrolling_down,
+						},
+					},
+				},
+			}
+			telescope.setup(opts)
+			require("telescope").load_extension("fzf")
+			require("telescope").load_extension("file_browser")
+		end,
+	},
+
+	{
+		"kazhala/close-buffers.nvim",
+		event = "VeryLazy",
+		keys = {
+			{
+				"<leader>th",
+				function()
+					require("close_buffers").delete({ type = "hidden" })
+				end,
+				"Close Hidden Buffers",
+			},
+			{
+				"<leader>tu",
+				function()
+					require("close_buffers").delete({ type = "nameless" })
+				end,
+				"Close Nameless Buffers",
+			},
+		},
+	},
+
+	{
+		"saghen/blink.cmp",
+		opts = {
+			completion = {
+				menu = {
+					winblend = vim.o.pumblend,
+				},
+			},
+			signature = {
+				window = {
+					winblend = vim.o.pumblend,
+				},
+			},
+		},
+	},
 }
-
